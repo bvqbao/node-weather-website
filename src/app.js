@@ -40,19 +40,19 @@ app.get('/help', (req, res) => {
 
 app.get('/weather', (req, res) => {
     if (!req.query.address) {
-        return res.send({
+        return res.status(400).send({
             error: 'You must provide an address.'
         })
     }
 
     geocode(req.query.address, (error, { latitude, longidude, location } = {}) => {
         if (error) {
-            return res.send({ error })
+            return res.status(400).send({ error })
         }
     
         forecast (latitude, longidude, (error, forecastData) => {
             if (error) {
-                return res.send({ error })
+                return res.status(400).send({ error })
             }
             
             res.send({
@@ -65,7 +65,7 @@ app.get('/weather', (req, res) => {
 })
 
 app.get('/help/*', (req, res) => {
-    res.render('404', {
+    res.status(404).render('404', {
         title: '404',
         name: 'Bao Bui',
         errorMessage: 'Help article not found'
@@ -73,7 +73,7 @@ app.get('/help/*', (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.render('404', {
+    res.status(404).render('404', {
         title: '404',
         name: 'Bao Bui',
         errorMessage: 'Page not found'
