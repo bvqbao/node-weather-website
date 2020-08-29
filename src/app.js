@@ -5,7 +5,6 @@ const geocode = require('./utils/geocode.js')
 const forecast = require('./utils/forecast.js')
 
 const app = express()
-const port = process.env.PORT || 3000
 
 const publicDirectoryPath = path.join(__dirname, '../public')
 const viewsPath = path.join(__dirname, '../templates/views')
@@ -41,19 +40,19 @@ app.get('/help', (req, res) => {
 
 app.get('/weather', (req, res) => {
     if (!req.query.address) {
-        return res.send({
+        return res.status(400).send({
             error: 'You must provide an address.'
         })
     }
 
     geocode(req.query.address, (error, { latitude, longidude, location } = {}) => {
         if (error) {
-            return res.send({ error })
+            return res.status(400).send({ error })
         }
     
         forecast (latitude, longidude, (error, forecastData) => {
             if (error) {
-                return res.send({ error })
+                return res.status(400).send({ error })
             }
             
             res.send({
@@ -66,7 +65,7 @@ app.get('/weather', (req, res) => {
 })
 
 app.get('/help/*', (req, res) => {
-    res.render('404', {
+    res.status(404).render('404', {
         title: '404',
         name: 'Bao Bui',
         errorMessage: 'Help article not found'
@@ -74,13 +73,11 @@ app.get('/help/*', (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.render('404', {
+    res.status(404).render('404', {
         title: '404',
         name: 'Bao Bui',
         errorMessage: 'Page not found'
     })
 })
 
-app.listen(port, () => {
-    console.log(`Server is up on port ${port}.`)
-})
+module.exports = app

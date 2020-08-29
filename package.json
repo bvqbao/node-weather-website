@@ -2,10 +2,11 @@
   "name": "weather-website",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js -e js,hbs"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js -e js,hbs",
+    "test": "jest --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,8 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "jest": "^26.4.2",
+    "nodemon": "^2.0.4",
+    "supertest": "^4.0.2"
   }
 }
