@@ -1,9 +1,22 @@
 import request from 'supertest'
+import { ImportMock } from 'ts-mock-imports'
+import * as geocodeModule from './utils/geocode'
+import * as forecastModule from './utils/forecast'
 import app from './app'
 
-// Initialize HBS pages/engine
+let geocodeStub, forecastStub
+
 beforeAll(async () => {
+    // Initialize HBS pages/engine
     await request(app).get('/')
+
+    // Mock external API
+    geocodeStub = ImportMock.mockFunction(geocodeModule, 'default', {
+        error: 'Unable to connect to location services!'
+    })
+    forecastStub = ImportMock.mockFunction(forecastModule, 'default', {
+        error: 'Unable to connect to weather service!'
+    })
 })
 
 test('GET / should return weather page', async () => {
@@ -53,6 +66,22 @@ test('GET /nonexistentendpoints should return 404 page', async () => {
 
 test('GET /weather?location=Can%20Tho%20VN should return a forecast for Can Tho, Vietnam', async () => {
     const location = 'Can Tho VN'
+
+    if (geocodeStub) {
+        geocodeStub.returns({
+            data: {
+                latitude: 10.03333, longidude: 105.78333,
+                location: 'Can Tho, Vietnam'
+            }
+        })
+    }
+
+    if (forecastStub) {
+        forecastStub.returns({
+            data: '... The humidity is ...'
+        })
+    }
+
     const response = await request(app)
         .get(`/weather?address=${location}`)
         .expect('Content-Type', /json/)
@@ -77,6 +106,11 @@ test('GET /weather?location= should return an error', async () => {
 
 test('GET /weather?location=whereami should return an error', async () => {
     const location = 'whereami'
+    if (geocodeStub) {
+        geocodeStub.returns({
+            error: 'Unable to find location. Try another search.'
+        })
+    }
     const response = await request(app)
         .get(`/weather?address=${location}`)
         .expect('Content-Type', /json/)

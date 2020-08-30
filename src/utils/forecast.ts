@@ -1,17 +1,22 @@
-import request from 'request'
+import got from 'got'
+import ExternalJsonData from '../external-json-data'
 
-const forecast = (latitude, longitude, callback) => {
+const forecast = async (latitude, longitude): Promise<ExternalJsonData> => {
     const url = `http://api.weatherstack.com/current?access_key=4685b4c632bd818c537aff305e925f73&query=${latitude},${longitude}`
 
-    request({ url, json: true }, (error, { body = undefined } = {}) => {
-        if (error) {
-            callback('Unable to connect to weather service!', undefined)
-        } else if (body.error) {
-            callback('Unable to find location!', undefined)
-        } else {
-            callback(undefined, `${body.current.weather_descriptions[0]}. It is currently ${body.current.temperature} degress out. It feels like ${body.current.feelslike} degress out. The humidity is ${body.current.humidity}%.`)
+    try {
+        const { body } = await got(url, { responseType: 'json' })
+
+        if ((body as any).error == 0) {
+            return new ExternalJsonData('Unable to find location!', undefined)
         }
-    })
+
+        let current: any = (body as any).current
+        return new ExternalJsonData(undefined,
+            `${current.weather_descriptions[0]}. It is currently ${current.temperature} degress out. It feels like ${current.feelslike} degress out. The humidity is ${current.humidity}%.`)
+    } catch(error) {
+        return new ExternalJsonData('Unable to connect to weather service!', undefined)
+    }
 }
 
 export default forecast
