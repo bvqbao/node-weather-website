@@ -1,10 +1,10 @@
-const request = require('supertest')
+import request from 'supertest'
+import app from './app'
 
-// Supertest seems to not work with HBS pages for some reasons.
-//      A workaround is to manually start the web server
-//      and tell supertest to do the testing on that server
-// const app = require('./app.js')
-const app = 'localhost:3000'
+// Initialize HBS pages/engine
+beforeAll(async () => {
+    await request(app).get('/')
+})
 
 test('GET / should return weather page', async () => {
     const response = await request(app)
@@ -51,7 +51,7 @@ test('GET /nonexistentendpoints should return 404 page', async () => {
         .toMatch('<p>Page not found</p>')
 })
 
-test('GET /weather?location=Can%20Tho%20VN should return a forecast for Can Tho, Viet Nam', async () => {
+test('GET /weather?location=Can%20Tho%20VN should return a forecast for Can Tho, Vietnam', async () => {
     const location = 'Can Tho VN'
     const response = await request(app)
         .get(`/weather?address=${location}`)

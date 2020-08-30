@@ -1,8 +1,8 @@
-const path = require('path')
-const express = require('express')
-const hbs = require('hbs')
-const geocode = require('./utils/geocode.js')
-const forecast = require('./utils/forecast.js')
+import path from 'path'
+import express from 'express'
+import hbs from 'hbs'
+import geocode from './utils/geocode'
+import forecast from './utils/forecast'
 
 const app = express()
 
@@ -45,7 +45,7 @@ app.get('/weather', (req, res) => {
         })
     }
 
-    geocode(req.query.address, (error, { latitude, longidude, location } = {}) => {
+    geocode(req.query.address, (error, { latitude = undefined, longidude = undefined, location = undefined } = {}) => {
         if (error) {
             return res.status(400).send({ error })
         }
@@ -80,4 +80,4 @@ app.get('*', (req, res) => {
     })
 })
 
-module.exports = app
+export default app

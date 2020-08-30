@@ -1,9 +1,9 @@
-const request = require('request')
+import request from 'request'
 
 const forecast = (latitude, longitude, callback) => {
     const url = `http://api.weatherstack.com/current?access_key=4685b4c632bd818c537aff305e925f73&query=${latitude},${longitude}`
 
-    request({ url, json: true }, (error, { body } = {}) => {
+    request({ url, json: true }, (error, { body = undefined } = {}) => {
         if (error) {
             callback('Unable to connect to weather service!', undefined)
         } else if (body.error) {
@@ -14,4 +14,4 @@ const forecast = (latitude, longitude, callback) => {
     })
 }
 
-module.exports = forecast
+export default forecast
