@@ -5,13 +5,13 @@ const forecast = async (latitude, longitude): Promise<ExternalJsonData> => {
     const url = `http://api.weatherstack.com/current?access_key=4685b4c632bd818c537aff305e925f73&query=${latitude},${longitude}`
 
     try {
-        const { body } = await got(url, { responseType: 'json' })
+        const { body }: { body: any } = await got(url, { responseType: 'json' })
 
-        if ((body as any).error == 0) {
+        if (body.error == 0) {
             return new ExternalJsonData('Unable to find location!', undefined)
         }
 
-        let current: any = (body as any).current
+        let current: any = body.current
         return new ExternalJsonData(undefined,
             `${current.weather_descriptions[0]}. It is currently ${current.temperature} degress out. It feels like ${current.feelslike} degress out. The humidity is ${current.humidity}%.`)
     } catch(error) {
