@@ -48,16 +48,12 @@ app.get('/weather', async (req, res) => {
 
     const geocodeRes: ExternalJsonData = await geocode(req.query.address)
     if (geocodeRes.error) {
-        return res.status(400).send({
-            error: geocodeRes.error
-        })
+        return res.status(400).send(geocodeRes)
     }
 
     const forecastRes: ExternalJsonData = await forecast(geocodeRes.data.latitude, geocodeRes.data.longidude)
     if (forecastRes.error) {
-        return res.status(400).send({
-            error: forecastRes
-        })
+        return res.status(400).send(forecastRes)
     }
 
     return res.send({
