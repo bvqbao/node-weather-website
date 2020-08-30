@@ -46,23 +46,23 @@ app.get('/weather', async (req, res) => {
         })
     }
 
-    const geocodeData: ExternalJsonData = await geocode(req.query.address)
-    if (geocodeData.error) {
+    const geocodeRes: ExternalJsonData = await geocode(req.query.address)
+    if (geocodeRes.error) {
         return res.status(400).send({
-            error: geocodeData.error
+            error: geocodeRes.error
         })
     }
 
-    const forecastData: ExternalJsonData = await forecast(geocodeData.data.latitude, geocodeData.data.longidude)
-    if (forecastData.error) {
+    const forecastRes: ExternalJsonData = await forecast(geocodeRes.data.latitude, geocodeRes.data.longidude)
+    if (forecastRes.error) {
         return res.status(400).send({
-            error: forecastData
+            error: forecastRes
         })
     }
 
     return res.send({
-        forecast: forecastData.data,
-        location: geocodeData.data.location,
+        forecast: forecastRes.data,
+        location: geocodeRes.data.location,
         address: req.query.address
     })
 })
