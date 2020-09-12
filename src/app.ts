@@ -1,8 +1,9 @@
-const path = require('path')
-const express = require('express')
-const hbs = require('hbs')
-const geocode = require('./utils/geocode.js')
-const forecast = require('./utils/forecast.js')
+import path from 'path'
+import express from 'express'
+import hbs from 'hbs'
+import ExternalJsonData from './external-json-data'
+import geocode from './utils/geocode'
+import forecast from './utils/forecast'
 
 const app = express()
 
@@ -38,29 +39,27 @@ app.get('/help', (req, res) => {
     })
 })
 
-app.get('/weather', (req, res) => {
+app.get('/weather', async (req, res) => {
     if (!req.query.address) {
         return res.status(400).send({
             error: 'You must provide an address.'
         })
     }
 
-    geocode(req.query.address, (error, { latitude, longidude, location } = {}) => {
-        if (error) {
-            return res.status(400).send({ error })
-        }
-    
-        forecast (latitude, longidude, (error, forecastData) => {
-            if (error) {
-                return res.status(400).send({ error })
-            }
-            
-            res.send({
-                forecast: forecastData,
-                location,
-                address: req.query.address
-            })
-        })
+    const geocodeRes: ExternalJsonData = await geocode(req.query.address)
+    if (geocodeRes.error) {
+        return res.status(400).send(geocodeRes)
+    }
+
+    const forecastRes: ExternalJsonData = await forecast(geocodeRes.data.latitude, geocodeRes.data.longidude)
+    if (forecastRes.error) {
+        return res.status(400).send(forecastRes)
+    }
+
+    return res.send({
+        forecast: forecastRes.data,
+        location: geocodeRes.data.location,
+        address: req.query.address
     })
 })
 
@@ -80,4 +79,4 @@ app.get('*', (req, res) => {
     })
 })
 
-module.exports = app
+export default app
